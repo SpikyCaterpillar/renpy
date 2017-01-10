@@ -911,8 +911,13 @@ class SWDraw(object):
         """
         Returns a pygame surface containing a screenshot.
         """
-
-        return self.window
+        # Ren'Py's PNGifier is confused by software windows' native bit format.
+        # Therefore, we create a surface with masks that the PNGifier
+        # understands, thus allowing it to save screenshots with the
+        # correct colours (at least on Debian).
+        ret = pygame.surface.Surface(self.window.get_size(), masks=(0xff,0xff00,0xff0000,0xff000000))
+        ret.blit(self.window,(0,0))
+        return ret
 
     def should_redraw(self, needs_redraw, first_pass):
         """
